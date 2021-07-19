@@ -30,7 +30,7 @@ export const useScaledDrawing = (
             x: scale * originalWidth * point.x + originX,
             y: scale * originalHeight * point.y + originY,
           })),
-          brushRadius: line.brushRadius * scale,
+          brushRadius: Math.round(line.brushRadius * scale),
         };
       }),
     };
@@ -60,7 +60,7 @@ export const useScaledDrawing = (
               y: (point.y - originY) / scale / originalHeight,
             })
           ),
-          brushRadius: line.brushRadius / scale,
+          brushRadius: Math.round(line.brushRadius / scale),
         };
       }),
     };
