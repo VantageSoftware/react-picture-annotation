@@ -488,6 +488,10 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
           <PaintLayer
             scaleState={this.scaleState}
             hidePaintLayer={hidePaintLayer}
+            originalFileSize={{
+              width: this.currentImageElement?.width ?? 0,
+              height: this.currentImageElement?.height ?? 0,
+            }}
           />
         )}
         <canvas
