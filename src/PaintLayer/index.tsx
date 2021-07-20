@@ -12,16 +12,31 @@ const StyledCanvasDraw = styled(CanvasDraw).attrs(
     if (!paintLayerEditMode) style.pointerEvents = "none";
     return { style };
   }
-)<{ paintLayerEditMode: boolean }>``;
+)<{ paintLayerEditMode: boolean }>`
+  background: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+`;
 
 type Props = {
   scaleState: IStageState;
   hidePaintLayer: boolean;
+  forceFinishDrawing: boolean;
+  setForceFinishDrawing: (value: boolean) => void;
 };
 
 export default function PaintLayer(props: Props): JSX.Element {
-  const { scaleState, hidePaintLayer } = props;
   const {
+    scaleState,
+    hidePaintLayer,
+    forceFinishDrawing,
+    setForceFinishDrawing,
+  } = props;
+  const {
+    file,
     paintLayerCanvasRef,
     paintLayerEditMode,
     brushColor,
@@ -39,8 +54,10 @@ export default function PaintLayer(props: Props): JSX.Element {
 
   const getDrawData = (): string | undefined =>
     paintLayerCanvasRef?.current?.getSaveData();
+
   const saveDrawing = () => {
     if (hidePaintLayer || !shouldSaveDrawData) return;
+
     const newDrawing = getDrawData();
     if (newDrawing && newDrawing !== drawData) {
       const rawDrawing = getRawDrawData(newDrawing);
@@ -78,7 +95,7 @@ export default function PaintLayer(props: Props): JSX.Element {
 
   useEffect(() => {
     adjustDrawingToScale();
-  }, [scaleState.scale, scaleState.originX, scaleState.originY, tempDrawData]);
+  }, [scaleState.scale, tempDrawData]);
 
   useEffect(() => {
     saveDrawing();
@@ -92,8 +109,15 @@ export default function PaintLayer(props: Props): JSX.Element {
     setTempDrawData(drawData);
   }, [drawData]);
 
+  useEffect(() => {
+    if (forceFinishDrawing) {
+      snapLineStraight();
+      setForceFinishDrawing(false);
+    }
+  }, [forceFinishDrawing]);
+
   return (
-    <Wrapper onMouseUp={snapLineStraight}>
+    <Wrapper onMouseUp={snapLineStraight} data-file-drawings={file?.id}>
       {!hidePaintLayer && (
         <StyledCanvasDraw
           ref={paintLayerCanvasRef}
@@ -106,7 +130,15 @@ export default function PaintLayer(props: Props): JSX.Element {
           disabled={!paintLayerEditMode}
           paintLayerEditMode={paintLayerEditMode}
           loadTimeOffset={loadTimeOffset}
-          style={{ background: "transparent" }}
+          style={{
+            background: "transparent",
+            width: "auto",
+            height: "auto",
+            // leave it like this, css is handling the moving of the pnid
+            // prevents unwanted repaint
+            left: scaleState.originX,
+            top: scaleState.originY,
+          }}
         />
       )}
     </Wrapper>
