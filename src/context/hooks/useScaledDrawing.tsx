@@ -4,8 +4,12 @@ import { IDrawingLine } from "types";
 import { IStageState } from "../../ReactPictureAnnotation";
 
 type LineMapCallback = (line: IDrawingLine, scale: number) => IDrawingLine;
+type OriginalFileSize = { width: number; height: number };
 
-export const useScaledDrawing = (scaleState: IStageState) => {
+export const useScaledDrawing = (
+  scaleState: IStageState,
+  originalFileSize: OriginalFileSize
+) => {
   /**
    * Process the drawing and adjust the lines scaling
    */
@@ -35,8 +39,11 @@ export const useScaledDrawing = (scaleState: IStageState) => {
    * Returns drawing scaled to current scale.
    */
   const getScaledDrawData = useCallback(
-    (drawingToScale: string): string => {
+    (drawingToScale: string): string | undefined => {
       const { scale } = scaleState;
+      const { width: originalWidth, height: originalHeight } = originalFileSize;
+
+      if (!originalWidth || !originalHeight) return;
 
       const scaledDrawDataCallback = (
         line: IDrawingLine,
@@ -45,10 +52,10 @@ export const useScaledDrawing = (scaleState: IStageState) => {
         return {
           ...line,
           points: line.points.map((point: any) => ({
-            x: point.x * scaleToUse,
-            y: point.y * scaleToUse,
+            x: point.x * scaleToUse * originalWidth,
+            y: point.y * scaleToUse * originalHeight,
           })),
-          brushRadius: line.brushRadius * scaleToUse,
+          brushRadius: Math.round(line.brushRadius * scaleToUse),
         };
       };
 
@@ -62,10 +69,13 @@ export const useScaledDrawing = (scaleState: IStageState) => {
    * or to percentage of canvas.
    */
   const getRawDrawData = useCallback(
-    (drawingToDescale: string): string => {
+    (drawingToDescale: string): string | undefined => {
       const { scale } = scaleState;
-      const tolerance = 5;
+      const { width: originalWidth, height: originalHeight } = originalFileSize;
       const highQuality = true;
+      const tolerance = 5;
+
+      if (!originalWidth || !originalHeight) return;
 
       const descaledDrawDataCallback = (
         line: IDrawingLine,
@@ -75,11 +85,11 @@ export const useScaledDrawing = (scaleState: IStageState) => {
           ...line,
           points: simplify(line.points, tolerance, highQuality).map(
             (point: any) => ({
-              x: point.x / scaleToUse,
-              y: point.y / scaleToUse,
+              x: point.x / scaleToUse / originalWidth,
+              y: point.y / scaleToUse / originalHeight,
             })
           ),
-          brushRadius: line.brushRadius / scaleToUse,
+          brushRadius: Math.round(line.brushRadius / scaleToUse),
         };
       };
 

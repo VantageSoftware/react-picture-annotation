@@ -26,6 +26,10 @@ type Props = {
   hidePaintLayer: boolean;
   forceFinishDrawing: boolean;
   setForceFinishDrawing: (value: boolean) => void;
+  originalFileSize: {
+    width: number;
+    height: number;
+  };
 };
 
 export default function PaintLayer(props: Props): JSX.Element {
@@ -34,6 +38,7 @@ export default function PaintLayer(props: Props): JSX.Element {
     hidePaintLayer,
     forceFinishDrawing,
     setForceFinishDrawing,
+    originalFileSize,
   } = props;
   const {
     file,
@@ -47,7 +52,10 @@ export default function PaintLayer(props: Props): JSX.Element {
     setDrawData,
     setShouldSaveDrawData,
   } = useContext(FileViewerContext);
-  const { getScaledDrawData, getRawDrawData } = useScaledDrawing(scaleState);
+  const { getScaledDrawData, getRawDrawData } = useScaledDrawing(
+    scaleState,
+    originalFileSize
+  );
   const [loadTimeOffset] = useState(0);
   const [scaledDrawData, setScaledDrawData] = useState(drawData);
   const [tempDrawData, setTempDrawData] = useState(drawData);
@@ -61,7 +69,7 @@ export default function PaintLayer(props: Props): JSX.Element {
     const newDrawing = getDrawData();
     if (newDrawing && newDrawing !== drawData) {
       const rawDrawing = getRawDrawData(newDrawing);
-      setDrawData(String(rawDrawing));
+      if (rawDrawing) setDrawData(String(rawDrawing));
     }
     setShouldSaveDrawData(false);
   };
@@ -71,17 +79,17 @@ export default function PaintLayer(props: Props): JSX.Element {
     const newDrawing = getDrawData();
     if (newDrawing && newDrawing !== drawData) {
       const rawDrawing = getRawDrawData(newDrawing);
-      setTempDrawData(String(rawDrawing));
+      if (rawDrawing) setTempDrawData(String(rawDrawing));
     }
   };
 
   const adjustDrawingToScale = () => {
     const scaledData = getScaledDrawData(tempDrawData);
-    setScaledDrawData(scaledData);
+    if (scaledData) setScaledDrawData(scaledData);
   };
 
   const snapLineStraight = () => {
-    if (!snapStraightEnabled) return;
+    if (!snapStraightEnabled || !paintLayerEditMode) return;
     const drawing = getDrawData();
     if (!drawing) return;
     const saveData = JSON.parse(drawing);
@@ -90,7 +98,7 @@ export default function PaintLayer(props: Props): JSX.Element {
     saveData.lines.push(lineToFix);
     const fixedSaveData = JSON.stringify(saveData);
     const rawDrawing = getRawDrawData(fixedSaveData);
-    setTempDrawData(String(rawDrawing));
+    if (rawDrawing) setTempDrawData(String(rawDrawing));
   };
 
   useEffect(() => {

@@ -501,6 +501,10 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
             hidePaintLayer={hidePaintLayer}
             forceFinishDrawing={this.state.forceFinishDrawing}
             setForceFinishDrawing={this.setForceFinishDrawing}
+            originalFileSize={{
+              width: this.currentImageElement?.width ?? 0,
+              height: this.currentImageElement?.height ?? 0,
+            }}
           />
         )}
 
