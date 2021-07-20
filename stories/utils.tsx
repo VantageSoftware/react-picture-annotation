@@ -79,8 +79,11 @@ export const pdfSdk = ({
 
 export const Container = styled.div`
   width: 100%;
-  height: 600px;
+  height: 100%;
   background: grey;
+  position: absolute;
+  top: 0;
+  bottom: 0;
 `;
 
 export const stubObserverObj = (_: FileViewerContextObserverPublicProps) =>

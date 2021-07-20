@@ -14,6 +14,7 @@ export const ColorPickCover = styled.div`
   right: 0px;
   bottom: 0px;
   left: 0px;
+  z-index: 100;
 `;
 
 export const ColorPreview = styled.div.attrs(
@@ -30,6 +31,7 @@ export const ColorPreview = styled.div.attrs(
   height: 24px;
   border-radius: 2px;
   cursor: pointer;
+  z-index: 100;
 `;
 
 export const WrappingBar = styled.div`

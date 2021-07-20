@@ -7,6 +7,8 @@ const Wrapper = styled.div`
   display: inline-flex;
   border-radius: 4px;
   overflow: hidden;
+  z-index: 100;
+
   & > * {
     border-radius: 0px;
   }

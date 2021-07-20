@@ -60,7 +60,11 @@ export type ViewerProps = {
    */
   hoverable?: boolean;
   /**
-   * Should the drawable Paint Layer render? Also shows the Draw icon on the toolbar
+   * Should the drawable Paint Layer render?
+   */
+  hidePaintLayer?: boolean;
+  /**
+   * Should the users be able to draw new drawings? Also shows the Draw icon on the toolbar
    */
   drawable?: boolean;
   /**
@@ -169,6 +173,7 @@ export const FileViewer = ({
   file: fileFromProps,
   hideLabel = true,
   hoverable = false,
+  hidePaintLayer = true,
   drawable = false,
   editCallbacks = {
     onUpdate: (a) => a,
@@ -381,6 +386,7 @@ export const FileViewer = ({
         }
       }
     }
+    annotatorRef.current?.forceMouseUp();
   };
 
   const onArrowBoxMoved = (
@@ -511,6 +517,7 @@ export const FileViewer = ({
         drawLabel={!hideLabel}
         hoverable={hoverable}
         editable={editable}
+        hidePaintLayer={hidePaintLayer}
         drawable={drawable}
         creatable={creatable}
         annotationData={annotationData}

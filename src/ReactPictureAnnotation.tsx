@@ -57,6 +57,7 @@ interface IReactPictureAnnotationProps {
   editable: boolean;
   creatable?: boolean;
   hoverable?: boolean;
+  hidePaintLayer?: boolean;
   drawable?: boolean;
   paintLayerEditMode: boolean;
   onPaintLayerDraw?: (drawData: string) => void;
@@ -124,6 +125,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
     editable: false,
     paintLayerEditMode: false,
     creatable: false,
+    hidePaintLayer: true,
     drawable: false,
     drawLabel: true,
     usePercentage: true,
@@ -142,6 +144,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
     hideArrowPreview: true,
     hidePaintLayer: true,
     isSpacePressed: false,
+    forceFinishDrawing: false,
   };
   private currentAnnotationData: IAnnotation[] = [];
   private selectedIdTrueValues: string[] = [];
@@ -164,6 +167,11 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
 
   private _PDF_DOC?: PDFDocumentProxy;
   private pdfBase64Prefix = "data:application/pdf;base64,";
+
+  constructor(props: IReactPictureAnnotationProps) {
+    super(props);
+    this.setForceFinishDrawing = this.setForceFinishDrawing.bind(this);
+  }
 
   public componentDidMount = async () => {
     const currentCanvas = this.canvasRef.current;
@@ -416,12 +424,15 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
     });
   };
 
+  private setForceFinishDrawing(value: boolean) {
+    this.setState({ forceFinishDrawing: value });
+  }
+
   public render() {
     const {
       width,
       height,
       annotationData,
-      drawable,
       renderItemPreview = (annotations) => (
         <DefaultInputSection
           annotation={annotations[0]}
@@ -484,12 +495,19 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
 
     return (
       <Wrapper>
-        {drawable && (
+        {!this.props.hidePaintLayer && (
           <PaintLayer
             scaleState={this.scaleState}
             hidePaintLayer={hidePaintLayer}
+            forceFinishDrawing={this.state.forceFinishDrawing}
+            setForceFinishDrawing={this.setForceFinishDrawing}
+            originalFileSize={{
+              width: this.currentImageElement?.width ?? 0,
+              height: this.currentImageElement?.height ?? 0,
+            }}
           />
         )}
+
         <canvas
           style={{ width, height }}
           className="rp-image"
@@ -709,6 +727,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
       if (!isNaN(imageNodeRatio) && !isNaN(canvasNodeRatio)) {
         if (imageNodeRatio < canvasNodeRatio) {
           const scale = canvasWidth / width;
+
           this.scaleState = {
             originX: (canvasWidth - scale * width) / 2,
             originY: (canvasHeight - scale * height) / 2,
@@ -1141,7 +1160,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
       this.setState({
         imageScale: this.scaleState,
         hideArrowPreview: true,
-        hidePaintLayer: true,
+        hidePaintLayer: false,
       });
 
       requestAnimationFrame(() => {
@@ -1153,6 +1172,13 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
   };
 
   private onMouseUp: MouseEventHandler<HTMLCanvasElement> = () => {
+    if (
+      !this.state.hidePaintLayer &&
+      !this.state.forceFinishDrawing &&
+      this.props.drawable
+    ) {
+      this.setForceFinishDrawing(true);
+    }
     this.currentAnnotationState.onMouseUp();
     this.startDrag = undefined;
     this.setState({ hideArrowPreview: false, hidePaintLayer: false });

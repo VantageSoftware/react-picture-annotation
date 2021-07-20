@@ -12,16 +12,36 @@ const StyledCanvasDraw = styled(CanvasDraw).attrs(
     if (!paintLayerEditMode) style.pointerEvents = "none";
     return { style };
   }
-)<{ paintLayerEditMode: boolean }>``;
+)<{ paintLayerEditMode: boolean }>`
+  background: transparent;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+`;
 
 type Props = {
   scaleState: IStageState;
   hidePaintLayer: boolean;
+  forceFinishDrawing: boolean;
+  setForceFinishDrawing: (value: boolean) => void;
+  originalFileSize: {
+    width: number;
+    height: number;
+  };
 };
 
 export default function PaintLayer(props: Props): JSX.Element {
-  const { scaleState, hidePaintLayer } = props;
   const {
+    scaleState,
+    hidePaintLayer,
+    forceFinishDrawing,
+    setForceFinishDrawing,
+    originalFileSize,
+  } = props;
+  const {
+    file,
     paintLayerCanvasRef,
     paintLayerEditMode,
     brushColor,
@@ -32,19 +52,24 @@ export default function PaintLayer(props: Props): JSX.Element {
     setDrawData,
     setShouldSaveDrawData,
   } = useContext(FileViewerContext);
-  const { getScaledDrawData, getRawDrawData } = useScaledDrawing(scaleState);
+  const { getScaledDrawData, getRawDrawData } = useScaledDrawing(
+    scaleState,
+    originalFileSize
+  );
   const [loadTimeOffset] = useState(0);
   const [scaledDrawData, setScaledDrawData] = useState(drawData);
   const [tempDrawData, setTempDrawData] = useState(drawData);
 
   const getDrawData = (): string | undefined =>
     paintLayerCanvasRef?.current?.getSaveData();
+
   const saveDrawing = () => {
     if (hidePaintLayer || !shouldSaveDrawData) return;
+
     const newDrawing = getDrawData();
     if (newDrawing && newDrawing !== drawData) {
       const rawDrawing = getRawDrawData(newDrawing);
-      setDrawData(String(rawDrawing));
+      if (rawDrawing) setDrawData(String(rawDrawing));
     }
     setShouldSaveDrawData(false);
   };
@@ -54,17 +79,17 @@ export default function PaintLayer(props: Props): JSX.Element {
     const newDrawing = getDrawData();
     if (newDrawing && newDrawing !== drawData) {
       const rawDrawing = getRawDrawData(newDrawing);
-      setTempDrawData(String(rawDrawing));
+      if (rawDrawing) setTempDrawData(String(rawDrawing));
     }
   };
 
   const adjustDrawingToScale = () => {
     const scaledData = getScaledDrawData(tempDrawData);
-    setScaledDrawData(scaledData);
+    if (scaledData) setScaledDrawData(scaledData);
   };
 
   const snapLineStraight = () => {
-    if (!snapStraightEnabled) return;
+    if (!snapStraightEnabled || !paintLayerEditMode) return;
     const drawing = getDrawData();
     if (!drawing) return;
     const saveData = JSON.parse(drawing);
@@ -73,12 +98,12 @@ export default function PaintLayer(props: Props): JSX.Element {
     saveData.lines.push(lineToFix);
     const fixedSaveData = JSON.stringify(saveData);
     const rawDrawing = getRawDrawData(fixedSaveData);
-    setTempDrawData(String(rawDrawing));
+    if (rawDrawing) setTempDrawData(String(rawDrawing));
   };
 
   useEffect(() => {
     adjustDrawingToScale();
-  }, [scaleState.scale, scaleState.originX, scaleState.originY, tempDrawData]);
+  }, [scaleState.scale, tempDrawData]);
 
   useEffect(() => {
     saveDrawing();
@@ -92,8 +117,15 @@ export default function PaintLayer(props: Props): JSX.Element {
     setTempDrawData(drawData);
   }, [drawData]);
 
+  useEffect(() => {
+    if (forceFinishDrawing) {
+      snapLineStraight();
+      setForceFinishDrawing(false);
+    }
+  }, [forceFinishDrawing]);
+
   return (
-    <Wrapper onMouseUp={snapLineStraight}>
+    <Wrapper onMouseUp={snapLineStraight} data-file-drawings={file?.id}>
       {!hidePaintLayer && (
         <StyledCanvasDraw
           ref={paintLayerCanvasRef}
@@ -106,7 +138,15 @@ export default function PaintLayer(props: Props): JSX.Element {
           disabled={!paintLayerEditMode}
           paintLayerEditMode={paintLayerEditMode}
           loadTimeOffset={loadTimeOffset}
-          style={{ background: "transparent" }}
+          style={{
+            background: "transparent",
+            width: "auto",
+            height: "auto",
+            // leave it like this, css is handling the moving of the pnid
+            // prevents unwanted repaint
+            left: scaleState.originX,
+            top: scaleState.originY,
+          }}
         />
       )}
     </Wrapper>
