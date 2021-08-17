@@ -132,7 +132,11 @@
   },
   "release": {
     "branches": [
-      "master"
+      "master",
+      {
+        "name": "beta",
+        "prerelease": true
+      }
     ],
     "plugins": [
       [
