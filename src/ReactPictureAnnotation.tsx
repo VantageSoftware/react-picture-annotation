@@ -570,11 +570,13 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
         const isSelected = this.selectedIds
           ? this.selectedIds.includes(itemId)
           : false;
+        const isHovered = item.hovered;
         const { scale } = this.scaleState;
         const { x, y, height, width } = item.paint(
           this.canvas2D,
           this.calculateShapePosition,
           isSelected,
+          isHovered,
           this.props.drawLabel,
           scale,
           false

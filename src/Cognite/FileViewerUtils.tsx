@@ -1,6 +1,5 @@
 import {
   PendingCogniteAnnotation,
-  getPnIDAnnotationType,
   CogniteAnnotation,
 } from "@cognite/annotations";
 import { Colors } from "@cognite/cogs.js";
@@ -54,41 +53,41 @@ export const selectAnnotationColors = <T extends PendingCogniteAnnotation>(
   if (isSelected)
     return {
       strokeColor: Colors["lightblue-1"].hex(),
-      backgroundColor: `${Colors.lightblue.hex()}08`,
+      backgroundColor: `${Colors.lightblue.hex()}11`,
     };
   if (isPending)
     return {
       strokeColor: Colors["yellow-1"].hex(),
-      backgroundColor: `${Colors["yellow-1"].hex()}05`,
+      backgroundColor: `${Colors["yellow-1"].hex()}33`,
     };
   if (annotation.resourceType === "asset")
     return {
       strokeColor: Colors["purple-3"].hex(),
-      backgroundColor: `${Colors["purple-3"].hex()}05`,
+      backgroundColor: `${Colors["purple-3"].hex()}33`,
     };
   if (annotation.resourceType === "file")
     return {
       strokeColor: Colors["midorange-3"].hex(),
-      backgroundColor: `${Colors["midorange-3"].hex()}05`,
+      backgroundColor: `${Colors["midorange-3"].hex()}33`,
     };
   if (annotation.resourceType === "timeSeries")
     return {
       strokeColor: Colors["lightblue-3"].hex(),
-      backgroundColor: `${Colors["lightblue-3"].hex()}05`,
+      backgroundColor: `${Colors["lightblue-3"].hex()}33`,
     };
   if (annotation.resourceType === "sequence")
     return {
       strokeColor: Colors["yellow-3"].hex(),
-      backgroundColor: `${Colors["yellow-3"].hex()}05`,
+      backgroundColor: `${Colors["yellow-3"].hex()}33`,
     };
   if (annotation.resourceType === "event")
     return {
       strokeColor: Colors["pink-3"].hex(),
-      backgroundColor: `${Colors["pink-3"].hex()}05`,
+      backgroundColor: `${Colors["pink-3"].hex()}33`,
     };
   return {
     strokeColor: Colors["text-color-secondary"].hex(),
-    backgroundColor: `${Colors["text-color-secondary"].hex()}05`,
+    backgroundColor: `${Colors["text-color-secondary"].hex()}33`,
   };
 };
 

@@ -60,10 +60,13 @@ export interface IShape {
     canvas2D: CanvasRenderingContext2D,
     calculateTruePosition: (shapeData: IShapeBase) => IShapeBase,
     selected: boolean,
+    hovered: boolean,
     drawLabel: boolean,
     scale: number,
     isDownload: boolean
   ) => IShapeBase;
+  hover: (isHovered: boolean, onShapeChange: () => void) => void;
+  hovered: boolean;
   getAnnotationData: () => IAnnotation;
   adjustMark: (adjustBase: IShapeAdjustBase) => void;
   setComment: (comment: string) => void;
@@ -79,6 +82,8 @@ export class RectShape implements IShape {
 
   private dragStartOffset: { offsetX: number; offsetY: number };
 
+  public hovered: boolean;
+
   constructor(
     data: IAnnotation<IShapeData>,
     onChange: () => void,
@@ -87,6 +92,7 @@ export class RectShape implements IShape {
     this.annotationData = data;
     this.onChangeCallBack = onChange;
     this.getImageSize = getImageSize;
+    this.hovered = false;
   }
 
   public onDragStart = (positionX: number, positionY: number) => {
@@ -143,10 +149,18 @@ export class RectShape implements IShape {
     return false;
   };
 
+  public hover = (isHovered: boolean, onShapeChange: () => void) => {
+    if (isHovered !== this.hovered) {
+      this.hovered = isHovered;
+      onShapeChange();
+    }
+  };
+
   public paint = (
     canvas2D: CanvasRenderingContext2D,
     calculateTruePosition: (shapeData: IShapeBase) => IShapeBase,
     selected: boolean,
+    hovered: boolean,
     drawLabel: boolean,
     scale: number,
     isDownload: boolean
@@ -173,26 +187,9 @@ export class RectShape implements IShape {
       canvas2D.shadowColor = mark.shadowColor || shapeStyle.shapeShadowStyle;
       canvas2D.strokeStyle = mark.strokeColor || shapeStyle.shapeStrokeStyle;
       canvas2D.lineWidth = mark.strokeWidth || 4;
-      if (mark.backgroundColor) {
-        canvas2D.fillStyle = mark.backgroundColor;
-        canvas2D.fillRect(
-          mark.highlight
-            ? x - canvas2D.lineWidth / 2 - padding
-            : x - canvas2D.lineWidth / 2,
-          mark.highlight
-            ? y - canvas2D.lineWidth / 2 - padding
-            : y - canvas2D.lineWidth / 2,
-          mark.highlight
-            ? width + canvas2D.lineWidth + padding * 2
-            : width + canvas2D.lineWidth,
-          mark.highlight
-            ? height + canvas2D.lineWidth + padding * 2
-            : height + canvas2D.lineWidth
-        );
-      }
       if (mark.strokeWidth !== 0) {
         if (selected) {
-          canvas2D.setLineDash([5]);
+          canvas2D.setLineDash([3]);
         }
         canvas2D.strokeRect(
           mark.highlight
@@ -209,7 +206,7 @@ export class RectShape implements IShape {
             : height + canvas2D.lineWidth
         );
       }
-      if (selected) {
+      if (selected || hovered) {
         canvas2D.fillStyle = mark.backgroundColor || shapeStyle.shapeBackground;
         canvas2D.fillRect(
           mark.highlight

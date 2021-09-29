@@ -9,4 +9,5 @@ export interface IAnnotationState {
   onMouseMove: (positionX: number, positionY: number) => void;
   onMouseLeave: () => void;
   onMouseUp: () => void;
+  isHovered?: boolean;
 }

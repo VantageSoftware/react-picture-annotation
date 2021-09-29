@@ -12,13 +12,16 @@ export class DefaultAnnotationState implements IAnnotationState {
   private hasMoved = false;
   private hasClicked = false;
   private hasSelected = false;
+  public isHovered = false;
 
   constructor(context: ReactPictureAnnotation) {
     this.context = context;
     this.hasMoved = false;
     this.hasSelected = false;
     this.hasClicked = false;
+    this.isHovered = false;
   }
+
   public onMouseMove = (positionX: number, positionY: number) => {
     if (this.hasClicked) {
       this.hasMoved = true;
@@ -160,6 +163,7 @@ export class DefaultAnnotationState implements IAnnotationState {
       onShapeChange();
     }
   };
+
   private checkCursor = (positionX: number, positionY: number) => {
     const {
       shapes,
@@ -178,10 +182,11 @@ export class DefaultAnnotationState implements IAnnotationState {
         if (!disableClick) {
           if (this.context.canvasRef.current) {
             this.context.canvasRef.current.style.cursor = "pointer";
+            shapes[i].hover(true, this.context.onShapeChange);
           }
         }
         return;
-      }
+      } else shapes[i].hover(false, this.context.onShapeChange);
     }
     if (creatable || editable) {
       if (this.context.canvasRef.current) {
