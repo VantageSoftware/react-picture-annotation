@@ -191,6 +191,9 @@ export class RectShape implements IShape {
         );
       }
       if (mark.strokeWidth !== 0) {
+        if (selected) {
+          canvas2D.setLineDash([5]);
+        }
         canvas2D.strokeRect(
           mark.highlight
             ? x - canvas2D.lineWidth / 2 - padding

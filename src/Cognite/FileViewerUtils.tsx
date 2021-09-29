@@ -54,7 +54,7 @@ export const selectAnnotationColors = <T extends PendingCogniteAnnotation>(
   if (isSelected)
     return {
       strokeColor: Colors["lightblue-1"].hex(),
-      backgroundColor: `${Colors["lightblue-1"].hex()}08`,
+      backgroundColor: `${Colors.lightblue.hex()}08`,
     };
   if (isPending)
     return {
