@@ -299,9 +299,9 @@ export const CustomizedAnnotations = () => {
   >([]);
   const mark = [
     {
-      backgroundColor: "#ff110055",
-      strokeColor: "#26ff0055",
-      strokeWidth: 0,
+      backgroundColor: "#ff110001",
+      strokeColor: "#ff110055",
+      strokeWidth: 2,
     },
     {
       draw: (

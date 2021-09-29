@@ -46,55 +46,50 @@ export type ArrowPreviewOptions = {
 /**
  * If there is no allowCustomAnnotations flag, those are the colors of the annotations.
  */
-export const selectAnnotationColor = <T extends PendingCogniteAnnotation>(
+export const selectAnnotationColors = <T extends PendingCogniteAnnotation>(
   annotation: T,
-  isSelected = false
-) => {
-  if (isSelected) {
-    return Colors.midblue.hex();
-  }
-  // Assets are purple
-  if (annotation.resourceType === "asset") {
-    if (getPnIDAnnotationType(annotation).includes("Model")) {
-      return Colors["purple-3"].hex();
-    }
-    return Colors["purple-2"].hex();
-  }
-
-  // Files are orange
-  if (annotation.resourceType === "file") {
-    if (getPnIDAnnotationType(annotation).includes("Model")) {
-      return Colors["midorange-3"].hex();
-    }
-    return Colors["midorange-2"].hex();
-  }
-
-  // TS are light blue
-  if (annotation.resourceType === "timeSeries") {
-    if (getPnIDAnnotationType(annotation).includes("Model")) {
-      return Colors["lightblue-3"].hex();
-    }
-    return Colors["lightblue-2"].hex();
-  }
-
-  // Sequences are yellow
-  if (annotation.resourceType === "sequence") {
-    if (getPnIDAnnotationType(annotation).includes("Model")) {
-      return Colors["yellow-3"].hex();
-    }
-    return Colors["yellow-2"].hex();
-  }
-
-  // Events are pink
-  if (annotation.resourceType === "event") {
-    if (getPnIDAnnotationType(annotation).includes("Model")) {
-      return Colors["pink-3"].hex();
-    }
-    return Colors["pink-2"].hex();
-  }
-
-  // Undefined are secondary
-  return Colors["text-color-secondary"].hex();
+  isSelected = false,
+  isPending = false
+): { strokeColor: string; backgroundColor: string } => {
+  if (isSelected)
+    return {
+      strokeColor: Colors["lightblue-1"].hex(),
+      backgroundColor: `${Colors["lightblue-1"].hex()}08`,
+    };
+  if (isPending)
+    return {
+      strokeColor: Colors["yellow-1"].hex(),
+      backgroundColor: `${Colors["yellow-1"].hex()}05`,
+    };
+  if (annotation.resourceType === "asset")
+    return {
+      strokeColor: Colors["purple-3"].hex(),
+      backgroundColor: `${Colors["purple-3"].hex()}05`,
+    };
+  if (annotation.resourceType === "file")
+    return {
+      strokeColor: Colors["midorange-3"].hex(),
+      backgroundColor: `${Colors["midorange-3"].hex()}05`,
+    };
+  if (annotation.resourceType === "timeSeries")
+    return {
+      strokeColor: Colors["lightblue-3"].hex(),
+      backgroundColor: `${Colors["lightblue-3"].hex()}05`,
+    };
+  if (annotation.resourceType === "sequence")
+    return {
+      strokeColor: Colors["yellow-3"].hex(),
+      backgroundColor: `${Colors["yellow-3"].hex()}05`,
+    };
+  if (annotation.resourceType === "event")
+    return {
+      strokeColor: Colors["pink-3"].hex(),
+      backgroundColor: `${Colors["pink-3"].hex()}05`,
+    };
+  return {
+    strokeColor: Colors["text-color-secondary"].hex(),
+    backgroundColor: `${Colors["text-color-secondary"].hex()}05`,
+  };
 };
 
 export const convertCogniteAnnotationToIAnnotation = (
@@ -103,9 +98,10 @@ export const convertCogniteAnnotationToIAnnotation = (
   allowCustomAnnotations: boolean
 ) => {
   const isPending = typeof el.id === "string";
+  const colors = selectAnnotationColors(el, isSelected, isPending);
   const annotation = {
-    id: `${el.id}`,
-    comment: el.label || "No Label",
+    id: String(el.id),
+    comment: el.label ?? "No Label",
     page: el.page,
     mark: {
       type: "RECT",
@@ -114,7 +110,8 @@ export const convertCogniteAnnotationToIAnnotation = (
       width: el.box.xMax - el.box.xMin,
       height: el.box.yMax - el.box.yMin,
       strokeWidth: 2,
-      strokeColor: isPending ? "yellow" : selectAnnotationColor(el, isSelected),
+      strokeColor: colors.strokeColor,
+      backgroundColor: colors.backgroundColor,
     },
   } as any;
 
@@ -142,7 +139,7 @@ export const isSameResource = (
   return (
     a.resourceType === b.resourceType &&
     !!(
-      (a.resourceExternalId && a.resourceExternalId === b.resourceExternalId) ||
+      a.resourceExternalId === b.resourceExternalId ||
       (a.resourceId && a.resourceId === b.resourceId)
     )
   );
