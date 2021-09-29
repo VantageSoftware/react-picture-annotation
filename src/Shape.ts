@@ -1,15 +1,16 @@
+import { Colors } from "@cognite/cogs.js";
 import { IAnnotation } from "./Annotation";
 
 export const shapeStyle = {
-  padding: 5,
+  padding: 6,
   margin: 10,
-  fontSize: 12,
-  fontColor: "#212529",
-  fontBackground: "#f8f9fa",
+  fontSize: 14,
+  fontColor: Colors.white.hex(),
+  fontBackground: Colors["greyscale-grey10"].hex(),
   fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif",
-  shapeBackground: "hsla(210, 16%, 93%, 0.2)",
-  shapeStrokeStyle: "ff0000",
+    "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  shapeBackground: Colors["greyscale-grey10"].hex(),
+  shapeStrokeStyle: Colors["greyscale-grey10"].hex(),
   shapeShadowStyle: "hsla(210, 9%, 31%, 0.35)",
 };
 
@@ -222,26 +223,25 @@ export class RectShape implements IShape {
             ? height + canvas2D.lineWidth + padding * 2
             : height + canvas2D.lineWidth
         );
-      } else {
-        const { comment } = this.annotationData;
-        if (comment && drawLabel) {
-          canvas2D.font = `${shapeStyle.fontSize}px ${shapeStyle.fontFamily}`;
-          const metrics = canvas2D.measureText(comment);
-          canvas2D.fillStyle = shapeStyle.fontBackground;
-          canvas2D.fillRect(
-            x,
-            y,
-            metrics.width + shapeStyle.padding * 2,
-            shapeStyle.fontSize + shapeStyle.padding * 2
-          );
-          canvas2D.textBaseline = "top";
-          canvas2D.fillStyle = shapeStyle.fontColor;
-          canvas2D.fillText(
-            comment,
-            x + shapeStyle.padding,
-            y + shapeStyle.padding
-          );
-        }
+      }
+      const { comment } = this.annotationData;
+      if (comment && !selected && (drawLabel || hovered)) {
+        canvas2D.font = `${shapeStyle.fontSize}px ${shapeStyle.fontFamily}`;
+        const metrics = canvas2D.measureText(comment);
+        canvas2D.fillStyle = shapeStyle.fontBackground;
+        canvas2D.fillRect(
+          x - 2,
+          y - 35,
+          metrics.width + shapeStyle.padding * 2,
+          shapeStyle.fontSize + shapeStyle.padding * 2
+        );
+        canvas2D.textBaseline = "top";
+        canvas2D.fillStyle = shapeStyle.fontColor;
+        canvas2D.fillText(
+          comment,
+          x + shapeStyle.padding - 2,
+          y + shapeStyle.padding - 35
+        );
       }
     }
     canvas2D.restore();
