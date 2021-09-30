@@ -85,7 +85,6 @@ export type ViewerProps = {
   renderAnnotation?: (
     el: CogniteAnnotation | ProposedCogniteAnnotation,
     isSelected: boolean,
-    isHovered: boolean,
     allowCustomAnnotations: boolean
   ) => IAnnotation<IRectShapeData>;
   /**
@@ -251,13 +250,7 @@ export const FileViewer = ({
         const isSelected = selectedAnnotations.some((item) =>
           isSameResource(el, item)
         );
-        const isHovered = false;
-        return renderAnnotation(
-          el,
-          isSelected,
-          isHovered,
-          !!allowCustomAnnotations
-        );
+        return renderAnnotation(el, isSelected, !!allowCustomAnnotations);
       }),
     [annotations, selectedAnnotations]
   );
