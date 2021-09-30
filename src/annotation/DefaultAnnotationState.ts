@@ -26,9 +26,6 @@ export class DefaultAnnotationState implements IAnnotationState {
     if (this.hasClicked) {
       this.hasMoved = true;
     }
-    if (this.context.props.hoverable) {
-      // this.checkSelectedId(positionX, positionY);
-    }
     this.checkCursor(positionX, positionY);
   };
   public onMouseUp = () => {
@@ -132,35 +129,6 @@ export class DefaultAnnotationState implements IAnnotationState {
       this.context.pendingShapeId = newShapeId;
 
       setState(new CreatingAnnotationState(this.context));
-    }
-  };
-
-  private checkSelectedId = (positionX: number, positionY: number) => {
-    const { shapes, onShapeChange } = this.context;
-    const ids: string[] = [];
-    for (let i = shapes.length - 1; i >= 0; i--) {
-      if (
-        shapes[i].checkBoundary(
-          positionX,
-          positionY,
-          this.context.calculateShapePositionNoOffset,
-          (shapes[i].getAnnotationData().mark.strokeWidth || 4) + 10
-        )
-      ) {
-        const { id, disableClick } = shapes[i].getAnnotationData();
-        if (!disableClick) {
-          ids.push(id);
-          onShapeChange();
-        }
-      }
-    }
-    if (ids.length > 0) {
-      this.context.selectedIds = ids;
-      return;
-    }
-    if (this.context.selectedIds) {
-      this.context.selectedIds = [];
-      onShapeChange();
     }
   };
 
