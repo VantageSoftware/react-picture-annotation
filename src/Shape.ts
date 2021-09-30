@@ -224,7 +224,7 @@ export class RectShape implements IShape {
         );
       }
       const { comment, status } = this.annotationData;
-      if (comment && !selected && (drawLabel || hovered)) {
+      if (comment && drawLabel) {
         canvas2D.font = `${shapeStyle.fontSize}px ${shapeStyle.fontFamily}`;
         const textLength = canvas2D.measureText(comment);
         canvas2D.fillStyle = shapeStyle.fontBackground;

@@ -121,6 +121,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
       this.selectedIdTrueValues!.some((it) => it === el.id)
     );
   }
+
   public static defaultProps = {
     editable: false,
     paintLayerEditMode: false,
@@ -477,20 +478,18 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
     };
 
     const showPreview = () => {
-      return (
-        <div
-          className="rp-selected-input"
-          style={inputPosition}
-          onMouseEnter={() => {
-            this.selectedIds = (this.selectedItems || []).map((el) => el.id);
-            if (!this.props.hoverable) {
-              this.currentAnnotationState.onMouseUp();
-            }
-          }}
-        >
-          {renderItemPreview(this.selectedItems, inputPosition.maxHeight)}
-        </div>
-      );
+      for (const item of this.shapes) {
+        const isHovered = item.hovered;
+        if (isHovered) {
+          const annotation = item.getAnnotationData();
+          return (
+            <div className="rp-selected-input" style={inputPosition}>
+              {renderItemPreview([annotation], inputPosition.maxHeight)}
+            </div>
+          );
+        }
+      }
+      return null;
     };
 
     return (
@@ -529,7 +528,11 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
           onTouchEnd={this.onTouchEnd}
           onTouchMove={this.onTouchMove}
         />
-        {this.selectedItems.length !== 0 && showInput && showPreview()}
+        {this.props.renderItemPreview &&
+          showInput &&
+          this.props.hoverable &&
+          annotationData &&
+          showPreview()}
         {renderArrowPreview &&
           annotationData &&
           !hideArrowPreview &&
@@ -552,6 +555,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
       );
 
       let hasSelectedItem = false;
+      let hasHoveredItem = false;
       let xMin = -1;
       let yMin = -1;
       let xMax = -1;
@@ -567,10 +571,10 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
       for (const item of this.shapes) {
         const annotation = item.getAnnotationData();
         const itemId = annotation.id;
+        const isHovered = item.hovered;
         const isSelected = this.selectedIds
           ? this.selectedIds.includes(itemId)
           : false;
-        const isHovered = item.hovered;
         const { scale } = this.scaleState;
         const { x, y, height, width } = item.paint(
           this.canvas2D,
@@ -595,7 +599,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
           };
         }
 
-        if (isSelected) {
+        if (isSelected || isHovered) {
           xMin = xMin === -1 || xMin > x ? x : xMin;
           yMin = yMin === -1 || yMin > y ? y : yMin;
           xMax = xMax === -1 || xMax < x + width ? x + width : xMax;
@@ -613,7 +617,8 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
             );
           }
 
-          hasSelectedItem = true;
+          if (isHovered) hasHoveredItem = true;
+          if (isSelected) hasSelectedItem = true;
 
           this.currentTransformer.paint(
             this.canvas2D,
@@ -621,7 +626,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
           );
         }
       }
-      if (!hasSelectedItem) {
+      if (!hasSelectedItem && !hasHoveredItem) {
         this.setState({
           showInput: false,
           inputComment: "",

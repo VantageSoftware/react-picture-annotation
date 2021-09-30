@@ -27,7 +27,7 @@ export class DefaultAnnotationState implements IAnnotationState {
       this.hasMoved = true;
     }
     if (this.context.props.hoverable) {
-      this.checkSelectedId(positionX, positionY);
+      // this.checkSelectedId(positionX, positionY);
     }
     this.checkCursor(positionX, positionY);
   };

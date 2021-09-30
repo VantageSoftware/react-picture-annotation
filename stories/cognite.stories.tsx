@@ -14,7 +14,7 @@ import {
   CogniteAnnotation,
 } from "@cognite/annotations";
 import { CustomizableCogniteAnnotation } from "./Cognite/FileViewerUtils";
-import { Button, Colors, Input } from "@cognite/cogs.js";
+import { Body, Button, Colors, Detail, Input } from "@cognite/cogs.js";
 import {
   useSelectedAnnotations,
   useExtractFromCanvas,
@@ -48,11 +48,52 @@ export const AllowCustomization = () => {
       );
     })();
   }, []);
+
+  const renderItemPreview = (annotation: any) => {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: Colors["greyscale-grey10"].hex(),
+          borderRadius: "6px",
+          padding: "6px",
+        }}
+      >
+        {annotation[0]?.status === "unhandled" && (
+          <Detail
+            strong={true}
+            style={{
+              backgroundColor: Colors["midblue-6"].hex(),
+              color: Colors["midblue-2"].hex(),
+              borderRadius: "4px",
+              padding: "2px 6px",
+              marginRight: "8px",
+            }}
+          >
+            New
+          </Detail>
+        )}
+        <Body
+          level={2}
+          strong={true}
+          style={{
+            color: Colors.white.hex(),
+          }}
+        >
+          {annotation[0]?.label ?? "This is an example preview."}
+        </Body>
+      </div>
+    );
+  };
+
   return (
     <CogniteFileViewer
       sdk={pdfSdk}
       file={pdfFile}
       disableAutoFetch={true}
+      hoverable={true}
+      renderItemPreview={renderItemPreview}
       annotations={annotations}
       pinchScaleModifier={number("Pinch zoom scale modifier", 0.001, {
         range: true,
