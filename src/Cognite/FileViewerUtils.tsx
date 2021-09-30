@@ -102,6 +102,7 @@ export const convertCogniteAnnotationToIAnnotation = (
     id: String(el.id),
     comment: el.label ?? "No Label",
     page: el.page,
+    status: el.status,
     mark: {
       type: "RECT",
       x: el.box.xMin,

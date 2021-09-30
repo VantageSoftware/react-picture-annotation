@@ -2,7 +2,7 @@ import { Colors } from "@cognite/cogs.js";
 import { IAnnotation } from "./Annotation";
 
 export const shapeStyle = {
-  padding: 6,
+  padding: 8,
   margin: 10,
   fontSize: 14,
   fontColor: Colors.white.hex(),
@@ -185,7 +185,6 @@ export class RectShape implements IShape {
     if (shouldDraw) {
       const padding = 5;
       canvas2D.shadowBlur = 10;
-      canvas2D.shadowColor = mark.shadowColor || shapeStyle.shapeShadowStyle;
       canvas2D.strokeStyle = mark.strokeColor || shapeStyle.shapeStrokeStyle;
       canvas2D.lineWidth = mark.strokeWidth || 4;
       if (mark.strokeWidth !== 0) {
@@ -224,15 +223,15 @@ export class RectShape implements IShape {
             : height + canvas2D.lineWidth
         );
       }
-      const { comment } = this.annotationData;
+      const { comment, status } = this.annotationData;
       if (comment && !selected && (drawLabel || hovered)) {
         canvas2D.font = `${shapeStyle.fontSize}px ${shapeStyle.fontFamily}`;
-        const metrics = canvas2D.measureText(comment);
+        const textLength = canvas2D.measureText(comment);
         canvas2D.fillStyle = shapeStyle.fontBackground;
         canvas2D.fillRect(
           x - 2,
           y - 35,
-          metrics.width + shapeStyle.padding * 2,
+          textLength.width + shapeStyle.padding * 2,
           shapeStyle.fontSize + shapeStyle.padding * 2
         );
         canvas2D.textBaseline = "top";
@@ -242,6 +241,21 @@ export class RectShape implements IShape {
           x + shapeStyle.padding - 2,
           y + shapeStyle.padding - 35
         );
+      }
+      if (status === "unhandled") {
+        const centerX = x + width;
+        const centerY = y;
+        const radius = 5;
+
+        canvas2D.setLineDash([0]);
+        canvas2D.beginPath();
+        canvas2D.shadowColor = "transparent";
+        canvas2D.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+        canvas2D.fillStyle = "#F74853";
+        canvas2D.fill();
+        canvas2D.lineWidth = 2;
+        canvas2D.strokeStyle = Colors.white.hex();
+        canvas2D.stroke();
       }
     }
     canvas2D.restore();
