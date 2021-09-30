@@ -12,19 +12,19 @@ export class DefaultAnnotationState implements IAnnotationState {
   private hasMoved = false;
   private hasClicked = false;
   private hasSelected = false;
+  public isHovered = false;
 
   constructor(context: ReactPictureAnnotation) {
     this.context = context;
     this.hasMoved = false;
     this.hasSelected = false;
     this.hasClicked = false;
+    this.isHovered = false;
   }
+
   public onMouseMove = (positionX: number, positionY: number) => {
     if (this.hasClicked) {
       this.hasMoved = true;
-    }
-    if (this.context.props.hoverable) {
-      this.checkSelectedId(positionX, positionY);
     }
     this.checkCursor(positionX, positionY);
   };
@@ -132,34 +132,6 @@ export class DefaultAnnotationState implements IAnnotationState {
     }
   };
 
-  private checkSelectedId = (positionX: number, positionY: number) => {
-    const { shapes, onShapeChange } = this.context;
-    const ids: string[] = [];
-    for (let i = shapes.length - 1; i >= 0; i--) {
-      if (
-        shapes[i].checkBoundary(
-          positionX,
-          positionY,
-          this.context.calculateShapePositionNoOffset,
-          (shapes[i].getAnnotationData().mark.strokeWidth || 4) + 10
-        )
-      ) {
-        const { id, disableClick } = shapes[i].getAnnotationData();
-        if (!disableClick) {
-          ids.push(id);
-          onShapeChange();
-        }
-      }
-    }
-    if (ids.length > 0) {
-      this.context.selectedIds = ids;
-      return;
-    }
-    if (this.context.selectedIds) {
-      this.context.selectedIds = [];
-      onShapeChange();
-    }
-  };
   private checkCursor = (positionX: number, positionY: number) => {
     const {
       shapes,
@@ -178,10 +150,11 @@ export class DefaultAnnotationState implements IAnnotationState {
         if (!disableClick) {
           if (this.context.canvasRef.current) {
             this.context.canvasRef.current.style.cursor = "pointer";
+            shapes[i].hover(true, this.context.onShapeChange);
           }
         }
         return;
-      }
+      } else shapes[i].hover(false, this.context.onShapeChange);
     }
     if (creatable || editable) {
       if (this.context.canvasRef.current) {

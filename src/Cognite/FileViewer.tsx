@@ -246,13 +246,12 @@ export const FileViewer = ({
 
   const combinedIAnnotations = useMemo(
     () =>
-      annotations.map((el) =>
-        renderAnnotation(
-          el,
-          selectedAnnotations.some((item) => isSameResource(el, item)),
-          !!allowCustomAnnotations
-        )
-      ),
+      annotations.map((el) => {
+        const isSelected = selectedAnnotations.some((item) =>
+          isSameResource(el, item)
+        );
+        return renderAnnotation(el, isSelected, !!allowCustomAnnotations);
+      }),
     [annotations, selectedAnnotations]
   );
 
