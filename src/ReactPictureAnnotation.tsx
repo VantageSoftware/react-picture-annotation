@@ -177,21 +177,9 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
   public componentDidMount = async () => {
     const currentCanvas = this.canvasRef.current;
     const currentImageCanvas = this.imageCanvasRef.current;
-    if (this.props.pdf) {
-      try {
-        const getDocParams = this.props.pdf.startsWith(this.pdfBase64Prefix)
-          ? { data: atob(this.props.pdf.replace(this.pdfBase64Prefix, "")) }
-          : { url: this.props.pdf };
-        this._PDF_DOC = await pdfjs.getDocument(getDocParams).promise;
-        if (this.props.onPDFLoaded) {
-          this.props.onPDFLoaded({ pages: this._PDF_DOC.numPages });
-        }
-      } catch (e) {
-        if (this.props.onPDFFailure) {
-          this.props.onPDFFailure({ url: this.props.pdf, error: e });
-        }
-      }
-    }
+
+    await this.loadPDF(this.props.pdf);
+
     if (currentCanvas && currentImageCanvas) {
       this.setCanvasDPI();
 
@@ -232,24 +220,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
       this.loadArrowPreviews();
     }
     if (prevProps.pdf !== pdf) {
-      if (pdf) {
-        try {
-          const getDocParams = pdf.startsWith(this.pdfBase64Prefix)
-            ? { data: atob(pdf.replace(this.pdfBase64Prefix, "")) }
-            : { url: pdf };
-
-          this._PDF_DOC = await pdfjs.getDocument(getDocParams).promise;
-          if (this.props.onPDFLoaded) {
-            this.props.onPDFLoaded({ pages: this._PDF_DOC.numPages });
-          }
-        } catch (e) {
-          if (this.props.onPDFFailure) {
-            this.props.onPDFFailure({ url: "", error: e });
-          }
-        }
-      } else {
-        this._PDF_DOC = undefined;
-      }
+      await this.loadPDF(pdf);
     }
     if (image && prevProps.image !== image) {
       this.cleanImage();
@@ -291,6 +262,33 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
     document.removeEventListener("keydown", this.keyListener);
     if (this.canvasRef.current) {
       this.canvasRef.current.removeEventListener("wheel", this.onWheel);
+    }
+  };
+
+  public loadPDF = async (pdf: string | undefined) => {
+    this._PDF_DOC = undefined;
+
+    if (!pdf) return;
+
+    this.props.onLoading(true);
+    this.cleanCanvas();
+    this.cleanImage();
+
+    try {
+      const getDocParams = pdf.startsWith(this.pdfBase64Prefix)
+        ? { data: atob(pdf.replace(this.pdfBase64Prefix, "")) }
+        : { url: pdf };
+
+      this._PDF_DOC = await pdfjs.getDocument(getDocParams).promise;
+      if (this.props.onPDFLoaded) {
+        this.props.onPDFLoaded({ pages: this._PDF_DOC.numPages });
+        this.props.onLoading(false);
+      }
+    } catch (e) {
+      if (this.props.onPDFFailure) {
+        this.props.onPDFFailure({ url: "", error: e });
+        this.props.onLoading(false);
+      }
     }
   };
 
@@ -547,12 +545,7 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
 
   public onShapeChange = () => {
     if (this.canvas2D && this.canvasRef.current) {
-      this.canvas2D.clearRect(
-        0,
-        0,
-        this.canvasRef.current.width,
-        this.canvasRef.current.height
-      );
+      this.cleanCanvas();
 
       let hasHoveredItem = false;
       let xMin = -1;
@@ -1060,6 +1053,17 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
     );
     this.shapes[selectedShapeIndex].getAnnotationData().comment = comment;
     this.onShapeChange();
+  };
+
+  private cleanCanvas = () => {
+    if (this.canvas2D && this.canvasRef.current) {
+      this.canvas2D.clearRect(
+        0,
+        0,
+        this.canvasRef.current.width,
+        this.canvasRef.current.height
+      );
+    }
   };
 
   private cleanImage = () => {

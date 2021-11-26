@@ -17,6 +17,7 @@ import {
   Playground,
   ZoomOnSelectedAnnotation,
   BoxAndArrows,
+  LoadDifferentFiles,
   RepositionToolbars,
 } from './cognite.stories.tsx';
 
@@ -204,6 +205,14 @@ The `toolbarPlacement` flag takes one string argument, which can be `topRight` |
 
 <Canvas>
   <Story story={RepositionToolbars} />
+</Canvas>
+
+### Load files
+
+This story shows the loading state when swapping to a different PDF file.
+
+<Canvas>
+  <Story story={LoadDifferentFiles} />
 </Canvas>
 
 ## Playground

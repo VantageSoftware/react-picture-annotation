@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, useContext } from "react";
+import styled from "styled-components";
 import { ReactPictureAnnotation, IAnnotation, IRectShapeData } from "..";
-import { Colors } from "@cognite/cogs.js";
+import { Colors, Flex, Icon } from "@cognite/cogs.js";
 import {
   CogniteAnnotation,
   CURRENT_VERSION,
@@ -242,7 +243,8 @@ export const FileViewer = ({
     if (fileFromProps) {
       setFile(fileFromProps);
     }
-  }, [fileFromProps, setFile]);
+    setPreviewUrl(undefined);
+  }, [fileFromProps]);
 
   const combinedIAnnotations = useMemo(
     () =>
@@ -267,7 +269,6 @@ export const FileViewer = ({
 
   const [height, setHeight] = useState(0);
   const [width, setWidth] = useState(0);
-  const [loading, setLoading] = useState(true);
   const [textboxes, setTextboxes] = useState<TextBox[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
 
@@ -315,9 +316,7 @@ export const FileViewer = ({
     (async () => {
       if (fileId) {
         setPreviewUrl(undefined);
-        setLoading(true);
         setPreviewUrl(await retrieveDownloadUrl(sdk, fileId));
-        setLoading(false);
       }
     })();
   }, [sdk, fileId]);
@@ -492,11 +491,7 @@ export const FileViewer = ({
         position: "relative",
       }}
     >
-      {loading && (
-        <div style={{ position: "absolute", height: "100%", width: "100%" }}>
-          {loader}
-        </div>
-      )}
+      <CustomLoader loader={loader} />
       <Toolbars
         toolbarPosition={toolbarPosition}
         hideControls={hideControls}
@@ -528,7 +523,6 @@ export const FileViewer = ({
         onAnnotationCreate={onCreateAnnotation}
         onAnnotationUpdate={onUpdateAnnotation}
         onArrowBoxMove={onArrowBoxMoved}
-        onLoading={(isLoading) => setLoading(isLoading)}
         image={file && isImage ? previewUrl : undefined}
         pdf={
           file && file.mimeType === "application/pdf" ? previewUrl : undefined
@@ -553,9 +547,7 @@ export const FileViewer = ({
           return renderItemPreview(currentAnnotations, maxHeight);
         }}
         onPDFLoaded={async ({ pages }) => {
-          setLoading(false);
           setTotalPages(pages);
-
           if (onFileLoaded) {
             onFileLoaded();
           }
@@ -565,3 +557,25 @@ export const FileViewer = ({
     </div>
   );
 };
+
+const CustomLoader = ({
+  loader,
+}: {
+  loader?: React.ReactNode;
+}): JSX.Element => {
+  return (
+    <Flex
+      justifyContent="center"
+      alignItems="center"
+      style={{ position: "absolute", height: "100%", width: "100%" }}
+    >
+      {loader ?? <StyledIcon type="LoadingSpinner" />}
+    </Flex>
+  );
+};
+
+const StyledIcon = styled(Icon)`
+  svg {
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 1));
+  }
+`;

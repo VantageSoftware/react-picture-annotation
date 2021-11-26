@@ -13,6 +13,7 @@ import {
   listAnnotationsForFile,
   CogniteAnnotation,
 } from "@cognite/annotations";
+import { CogniteClient } from "@cognite/sdk";
 import { CustomizableCogniteAnnotation } from "./Cognite/FileViewerUtils";
 import { Body, Button, Colors, Detail, Input } from "@cognite/cogs.js";
 import {
@@ -596,6 +597,57 @@ export const RepositionToolbars = () => {
           }
         }}
       />
+    </StoryWrapper>
+  );
+};
+
+export const LoadDifferentFiles = () => {
+  const [fixedPdfSdk, setFixedPdfSdk] = useState(pdfSdk);
+  const [fixedPdfFile, setFixedPdfFile] = useState(pdfFile);
+  const files = [
+    {
+      id: 123,
+      name: "test1",
+      url:
+        "https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf",
+    },
+    {
+      id: 321,
+      name: "test2",
+      url:
+        "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf",
+    },
+  ];
+
+  const onFileLoad = (fileId: number) => {
+    const file = files[fileId];
+    const newPdfFile = {
+      ...pdfFile,
+      id: file.id,
+      name: file.name,
+    };
+    const newPdfSdk = ({
+      ...pdfSdk,
+      files: {
+        ...pdfSdk.files,
+        getDownloadUrls: async () => [
+          {
+            downloadUrl: file.url,
+          },
+        ],
+      },
+    } as unknown) as CogniteClient;
+    setFixedPdfSdk(newPdfSdk);
+    setFixedPdfFile(newPdfFile);
+  };
+
+  return (
+    <StoryWrapper>
+      <SidebarHelper>
+        <button onClick={() => onFileLoad(0)}>Load first file</button>
+        <button onClick={() => onFileLoad(1)}>Load second file</button>
+      </SidebarHelper>
+      <CogniteFileViewer sdk={fixedPdfSdk} file={fixedPdfFile} />
     </StoryWrapper>
   );
 };
