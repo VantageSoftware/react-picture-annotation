@@ -279,10 +279,14 @@ export class ReactPictureAnnotation extends React.Component<IReactPictureAnnotat
         ? { data: atob(pdf.replace(this.pdfBase64Prefix, "")) }
         : { url: pdf };
 
-      this._PDF_DOC = await pdfjs.getDocument(getDocParams).promise;
-      if (this.props.onPDFLoaded) {
-        this.props.onPDFLoaded({ pages: this._PDF_DOC.numPages });
-        this.props.onLoading(false);
+      const pdfDoc = await pdfjs.getDocument(getDocParams).promise;
+      if (pdf === this.props.pdf) {
+        this._PDF_DOC = pdfDoc;
+
+        if (this.props.onPDFLoaded) {
+          this.props.onPDFLoaded({ pages: this._PDF_DOC!.numPages });
+          this.props.onLoading(false);
+        }
       }
     } catch (e) {
       if (this.props.onPDFFailure) {
