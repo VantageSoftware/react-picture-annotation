@@ -272,7 +272,7 @@ export const FileViewer = ({
   const [textboxes, setTextboxes] = useState<TextBox[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
 
-  const fileId = file ? file.id : undefined;
+  const fileId = fileFromProps ? fileFromProps.id : undefined;
 
   const textboxesToShow = useMemo(
     () =>
