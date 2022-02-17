@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CogniteClient, FileInfo } from "@cognite/sdk";
+import * as pdfjs from "pdfjs-dist";
 import {
   CogniteAnnotation,
   listAnnotationsForFile,
@@ -13,6 +14,9 @@ import {
 } from "../ReactPictureAnnotation";
 import { RGBColor, DEFAULT } from "../utils";
 
+export type OverrideURLMap = {
+  pdfjsWorkerSrc?: string;
+} & Record<string, string>;
 export type FileViewerContextObserver = FileViewerContextObserverPublicProps &
   FileViewerContextObserverPrivateProps &
   FileViewerContextObserverPaintLayerProps;
@@ -188,15 +192,22 @@ export type ContextProps = {
    * Should fetching of annotations happen automatically? Unless you want to hook annotations fetching/storing into your store or augment annotations from CDF before sending into viewer, and you can trust the viewer to fetch annotations each time a file is supplied.
    */
   disableAutoFetch?: boolean;
+  overrideURLMap?: OverrideURLMap;
 };
 
 const FileViewerProvider = ({
   sdk,
   children,
   disableAutoFetch = false,
+  overrideURLMap,
 }: {
   children: React.ReactNode;
 } & ContextProps) => {
+  const { pdfjsWorkerSrc } = overrideURLMap ?? {};
+  pdfjs.GlobalWorkerOptions.workerSrc =
+    pdfjsWorkerSrc ??
+    `https://cdf-hub-bundles.cogniteapp.com/dependencies/pdfjs-dist@2.6.347/build/pdf.worker.min.js`;
+
   const [annotations, setAnnotations] = useState<
     (CogniteAnnotation | ProposedCogniteAnnotation)[]
   >([]);

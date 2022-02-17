@@ -1,6 +1,6 @@
 {
   "name": "@cognite/react-picture-annotation",
-  "version": "2.1.0-beta.3",
+  "version": "2.1.0-beta.4",
   "description": "A simple pdf/image annotation component.",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
