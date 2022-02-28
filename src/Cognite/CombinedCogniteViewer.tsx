@@ -9,10 +9,15 @@ import {
 const CombinedCogniteFileViewer = ({
   sdk,
   disableAutoFetch,
+  overrideURLMap,
   ...extraProps
 }: ContextProps & ViewerProps) => {
   return (
-    <FileViewerProvider sdk={sdk} disableAutoFetch={disableAutoFetch}>
+    <FileViewerProvider
+      sdk={sdk}
+      disableAutoFetch={disableAutoFetch}
+      overrideURLMap={overrideURLMap}
+    >
       <FileViewer {...(extraProps as ViewerProps)} />
     </FileViewerProvider>
   );
