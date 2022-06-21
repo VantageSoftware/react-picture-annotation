@@ -1180,10 +1180,10 @@
     react-toastify "^6.0.9"
     tippy.js "6.2.0"
 
-"@cognite/sdk-core@^4.0.3":
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/@cognite/sdk-core/-/sdk-core-4.0.3.tgz#662db3e2dc5507276e2fc76859f0391c13269c9d"
-  integrity sha512-RBzNwCKfkIUGtzhQ8n+6cNmuYY3f031vfRId2X9iQpS6VBl3Qnasc/9wqZhtN6qVMtFBsn4nDLXL6YUNNII3lw==
+"@cognite/sdk-core@^4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@cognite/sdk-core/-/sdk-core-4.5.0.tgz#d93c128f552aed124128345adc8f35ce1cbba3a5"
+  integrity sha512-HwurP2XfkTQcPgKI5R+90i5vpRNI2EyZf7Qvvauw5VCXmn7iOgOgEJD1BaXCmP/Oz280VySPBwhSLih/6Ffbvg==
   dependencies:
     cross-fetch "^3.0.4"
     is-buffer "^2.0.5"
@@ -1191,12 +1191,13 @@
     query-string "^5.1.1"
     url "^0.11.0"
 
-"@cognite/sdk@^6.3.1":
-  version "6.3.1"
-  resolved "https://registry.yarnpkg.com/@cognite/sdk/-/sdk-6.3.1.tgz#b4020b81057da765f6b9bfbbd96a926afe82ac32"
-  integrity sha512-pQ7Gtp0OpkX7qZtze1Fv/XxnNagWgWyXO9Tl83NmiJjGRP0RD49djQUdqwFOE2pEFAYoYKuGfVAXpyRsOf8nuw==
+"@cognite/sdk@^7.7.0":
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/@cognite/sdk/-/sdk-7.7.0.tgz#91080a08173c64d72cfecac2a55ef59a5770a7a1"
+  integrity sha512-W4fhpowZqE4asb0wS0H7MpwwSWVjb0P+IutMqSSgRZz1uPtlXIjeZFXeGm0QNXHbR7C8wLxXubam7ke+cEVcjA==
   dependencies:
-    "@cognite/sdk-core" "^4.0.3"
+    "@cognite/sdk-core" "^4.5.0"
+    geojson "^0.5.0"
     lodash "^4.17.11"
 
 "@commitlint/cli@^11.0.0":
@@ -7788,6 +7789,11 @@ gentle-fs@^2.3.0, gentle-fs@^2.3.1:
     path-is-inside "^1.0.2"
     read-cmd-shim "^1.0.1"
     slide "^1.1.6"
+
+geojson@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/geojson/-/geojson-0.5.0.tgz#3cd6c96399be65b56ee55596116fe9191ce701c0"
+  integrity sha512-/Bx5lEn+qRF4TfQ5aLu6NH+UKtvIv7Lhc487y/c8BdludrCTpiWf9wyI0RTyqg49MFefIAvFDuEi5Dfd/zgNxQ==
 
 get-caller-file@^1.0.1:
   version "1.0.3"
